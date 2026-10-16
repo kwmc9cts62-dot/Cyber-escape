@@ -1,1 +1,431 @@
-# Cyber-escape
+<!DOCTYPE html>
+
+<html lang="ar" dir="rtl">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>فحص النظام</title>
+
+<style>
+
+* {
+
+  box-sizing: border-box;
+
+}
+
+body {
+
+  margin: 0;
+
+  min-height: 100vh;
+
+  background: #020704;
+
+  color: #00ff80;
+
+  font-family: monospace, Tahoma, sans-serif;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  padding: 20px;
+
+}
+
+.screen {
+
+  width: 100%;
+
+  max-width: 440px;
+
+  padding: 25px 20px;
+
+  border: 1px solid #00ff8055;
+
+  border-radius: 15px;
+
+  background: #06100b;
+
+  box-shadow: 0 0 30px #00ff801a;
+
+  text-align: center;
+
+}
+
+.top {
+
+  font-size: 12px;
+
+  color: #4cba7e;
+
+  letter-spacing: 2px;
+
+  margin-bottom: 25px;
+
+}
+
+.icon {
+
+  font-size: 48px;
+
+  margin-bottom: 15px;
+
+}
+
+h1 {
+
+  font-size: 22px;
+
+  text-shadow: 0 0 12px #00ff80;
+
+}
+
+.status {
+
+  font-size: 14px;
+
+  margin: 25px 0 12px;
+
+}
+
+.bar {
+
+  width: 100%;
+
+  height: 12px;
+
+  border: 1px solid #00ff80;
+
+  padding: 2px;
+
+  border-radius: 3px;
+
+}
+
+.fill {
+
+  width: 0%;
+
+  height: 100%;
+
+  background: #00ff80;
+
+  box-shadow: 0 0 10px #00ff80;
+
+  transition: width .15s linear;
+
+}
+
+.percent {
+
+  margin-top: 10px;
+
+  font-size: 13px;
+
+}
+
+.logs {
+
+  height: 95px;
+
+  overflow: hidden;
+
+  text-align: right;
+
+  color: #61c78e;
+
+  font-size: 12px;
+
+  line-height: 1.9;
+
+  margin-top: 20px;
+
+}
+
+.result {
+
+  display: none;
+
+  margin-top: 25px;
+
+  padding: 20px 10px;
+
+  border: 1px solid #ff3b65;
+
+  border-radius: 10px;
+
+  color: #ff5478;
+
+  animation: pop .5s ease;
+
+}
+
+.result h2 {
+
+  font-size: 23px;
+
+  text-shadow: 0 0 12px #ff1744;
+
+}
+
+.result p {
+
+  color: #eee;
+
+  font-family: Tahoma, sans-serif;
+
+  font-size: 14px;
+
+}
+
+button {
+
+  margin-top: 22px;
+
+  padding: 13px 20px;
+
+  width: 100%;
+
+  background: #00ff80;
+
+  border: none;
+
+  border-radius: 7px;
+
+  color: #001b0c;
+
+  font-size: 16px;
+
+  font-weight: bold;
+
+  cursor: pointer;
+
+}
+
+button:active {
+
+  transform: scale(.97);
+
+}
+
+.disclaimer {
+
+  font-size: 10px;
+
+  color: #467a5b;
+
+  margin-top: 20px;
+
+}
+
+@keyframes pop {
+
+  from {
+
+    opacity: 0;
+
+    transform: scale(.8);
+
+  }
+
+  to {
+
+    opacity: 1;
+
+    transform: scale(1);
+
+  }
+
+}
+
+.blink {
+
+  animation: blink 1s infinite;
+
+}
+
+@keyframes blink {
+
+  50% { opacity: .3; }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="screen">
+
+  <div class="top">SYSTEM DIAGNOSTICS // V.2.0</div>
+
+  <div class="icon">⌘</div>
+
+  <h1>جاري فحص النظام...</h1>
+
+  <div class="status blink" id="status">
+
+    جاري تهيئة الفحص
+
+  </div>
+
+  <div class="bar">
+
+    <div class="fill" id="fill"></div>
+
+  </div>
+
+  <div class="percent" id="percent">0%</div>
+
+  <div class="logs" id="logs">
+
+    > بدء تشغيل النظام...<br>
+
+    > تجهيز أدوات الفحص...
+
+  </div>
+
+  <div class="result" id="result">
+
+    <div style="font-size:40px">😂</div>
+
+    <h2>تم اكتشاف هطف جديد!</h2>
+
+    <p>مبروك، أنت الهطف رقم 1 في القائمة 💀</p>
+
+    <p>نتيجة الفحص: هطافة 100%</p>
+
+  </div>
+
+  <button id="start" onclick="startScan()">
+
+    ابدأ الفحص
+
+  </button>
+
+  <div class="disclaimer">
+
+    SIMULATION MODE — محاكاة ترفيهية فقط
+
+  </div>
+
+</div>
+
+<script>
+
+let timer = null;
+
+let progress = 0;
+
+const messages = [
+
+  "جاري فحص النظام...",
+
+  "جاري تحليل الملفات...",
+
+  "جاري البحث عن الهطف...",
+
+  "جاري قياس مستوى الهطافة...",
+
+  "تقريبًا لقيناه...",
+
+  "جاري تجهيز النتيجة..."
+
+];
+
+function startScan() {
+
+  clearInterval(timer);
+
+  progress = 0;
+
+  const fill = document.getElementById("fill");
+
+  const percent = document.getElementById("percent");
+
+  const status = document.getElementById("status");
+
+  const result = document.getElementById("result");
+
+  const logs = document.getElementById("logs");
+
+  const button = document.getElementById("start");
+
+  result.style.display = "none";
+
+  button.disabled = true;
+
+  button.textContent = "جاري الفحص...";
+
+  logs.innerHTML = "> بدء الفحص الوهمي...<br>";
+
+  timer = setInterval(() => {
+
+    progress += Math.floor(Math.random() * 7) + 2;
+
+    if (progress >= 100) {
+
+      progress = 100;
+
+      clearInterval(timer);
+
+      fill.style.width = "100%";
+
+      percent.textContent = "100%";
+
+      status.textContent = "اكتمل الفحص!";
+
+      logs.innerHTML += "> اكتمل التحليل الوهمي!<br>";
+
+      result.style.display = "block";
+
+      button.disabled = false;
+
+      button.textContent = "افحص مرة ثانية 😂";
+
+      return;
+
+    }
+
+    fill.style.width = progress + "%";
+
+    percent.textContent = progress + "%";
+
+    let index = Math.min(
+
+      Math.floor(progress / 20),
+
+      messages.length - 1
+
+    );
+
+    status.textContent = messages[index];
+
+    if (progress % 10 < 7) {
+
+      logs.innerHTML += "> " +
+
+        messages[index] + "<br>";
+
+      logs.scrollTop = logs.scrollHeight;
+
+    }
+
+  }, 220);
+
+}
+
+</script>
+
+</body>
+
+</html>
